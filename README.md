@@ -12,7 +12,7 @@ To Do:
 ## Task 2: Memory and Chain
 
 To Do:
-- [ ] Implement conversational memory
+- [x] Implement conversational memory
 - [ ] Create chains
 - [ ] Connect multiple LLM operations
 - [ ] Build a multi-step workflow

@@ -192,3 +192,120 @@
   output_dict = output_parser.parse(response.content)
   print(type(output_dict))
   ```
+
+## Memory
+
+An LLM does not organically have a memeory. There are specific methods through which one can simulate having a memeory. The following are a few of the available ways to incorporate conversation history to an LLM.
+
+#### ConversationBufferMemory
+
+To save the history of a conversion.
+
+  ```
+  from langchain.chat_models import ChatOpenAI
+  from langchain.chains import ConversationChain
+  from langchain.memory import ConversationBufferMemory
+
+  llm = ChatOpenAI(temperature=0.0, model=llm_model)
+  memory = ConversationBufferMemory()
+  conversation = ConversationChain(
+      llm=llm, 
+      memory = memory,
+      verbose=True
+  )
+  ```
+
+Examples of a conversation.
+  ```
+  conversation.predict(input="Hi, my name is Andrew")
+  conversation.predict(input="What is 1+1?")
+  conversation.predict(input="What is my name?")
+  ```
+The conversation history allows the LLM to answer the 3rd question correctly.
+
+To see the memory buffer `print(memory.buffer)`.
+
+To see the load emmory variables `memory.load_memory_variables({})`.
+
+Creating one's own conversation history:
+  ```
+  memory = ConversationBufferMemory()
+  memory.save_context({"input": "Hi"}, {"output": "What's up"})
+  memory.save_context({"input": "Not much, just hanging"}, {"output": "Cool"})
+  print(memory.load_memory_variables({}))
+  ```
+
+#### ConversationBufferWindowMemory
+
+Limit the amount of conversation history the LLM has to a specific window.
+
+For Example:
+  ```
+  from langchain.memory import ConversationBufferWindowMemory
+
+  memory = ConversationBufferWindowMemory(k=1)
+  ```
+  This limits the memory to one previous conversation. Thus, when the foloowing code is run:
+  ```
+  memory.save_context({"input": "Hi"}, {"output": "What's up"})
+  memory.save_context({"input": "Not much, just hanging"}, {"output": "Cool"})
+  ```
+  The resulting print of `memory.load_memory_variables({})` is only the second conversation. Therefore, given the chat example in the previous lesson, Asking chat to tell the name no longer works as it is a conversation that was before the previous one.
+
+  Changing the value of k will result in different number of chat history that is remembered.
+
+#### ConversationTokenBufferMemory
+
+Memory is in tokens and can be limited.
+
+Example code:
+  ```
+  #!pip install tiktoken
+
+  from langchain.memory import ConversationTokenBufferMemory
+  from langchain.llms import OpenAI
+  llm = ChatOpenAI(temperature=0.0, model=llm_model)
+
+  memory = ConversationTokenBufferMemory(llm=llm, max_token_limit=50)
+  memory.save_context({"input": "AI is what?!"}, {"output": "Amazing!"})
+  memory.save_context({"input": "Backpropagation is what?"}, {"output": "Beautiful!"})
+  memory.save_context({"input": "Chatbots are what?"}, {"output": "Charming!"})
+
+  print(memory.load_memory_variables({}))
+  ```
+
+#### ConversationSummaryMemory
+
+When the history crosses the limit placed, the LLM can create a summary of the conversation history to pass as context in the prompt.
+
+Example:
+  ```
+  from langchain.memory import ConversationSummaryBufferMemory
+
+  # create a long string
+  schedule = "There is a meeting at 8am with your product team. \
+  You will need your powerpoint presentation prepared. \
+  9am-12pm have time to work on your LangChain \
+  project which will go quickly because Langchain is such a powerful tool. \
+  At Noon, lunch at the italian resturant with a customer who is driving \
+  from over an hour away to meet you to understand the latest in AI. \
+  Be sure to bring your laptop to show the latest LLM demo."
+
+  memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=100)
+  memory.save_context({"input": "Hello"}, {"output": "What's up"})
+  memory.save_context({"input": "Not much, just hanging"}, {"output": "Cool"})
+  memory.save_context({"input": "What is on the schedule today?"}, {"output": f"{schedule}"})
+  ```
+
+  The history is too long and so, the stored history is a summary when `memory.load_memory_variables({})` is printed.
+
+  princting:
+  ```
+  conversation = ConversationChain(
+      llm=llm, 
+      memory = memory,
+      verbose=True
+  )
+
+  conversation.predict(input="What would be a good demo to show?")
+  ```
