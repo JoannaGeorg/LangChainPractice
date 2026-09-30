@@ -13,6 +13,6 @@ To Do:
 
 To Do:
 - [x] Implement conversational memory
-- [ ] Create chains
-- [ ] Connect multiple LLM operations
-- [ ] Build a multi-step workflow
+- [x] Create chains
+- [x] Connect multiple LLM operations
+- [x] Build a multi-step workflow
