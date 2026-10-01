@@ -16,3 +16,12 @@ To Do:
 - [x] Create chains
 - [x] Connect multiple LLM operations
 - [x] Build a multi-step workflow
+
+## Task 3: Question and Answers with LangChain
+
+To Do:
+- [ ] Load sample documents/data
+- [ ] Provide relevant context to the model
+- [ ] Ask questions against the supplied information
+- [ ] Test different questions
+- [ ] Improve response quality
