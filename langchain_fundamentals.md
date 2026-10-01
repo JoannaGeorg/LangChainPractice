@@ -566,3 +566,249 @@ Code Example:
   # Math Based
   chain.run("what is 2 + 2")
   ```
+
+## Question and Answer
+
+Given a document, or a piece of text, the LLM is expected to answer question on them.
+
+Example Code:
+  ```
+  from langchain.chains import RetrievalQA
+  from langchain.chat_models import ChatOpenAI
+  from langchain.document_loaders import CSVLoader
+  from langchain.vectorstores import DocArrayInMemorySearch
+  from IPython.display import display, Markdown
+  from langchain.llms import OpenAI
+
+  file = 'OutdoorClothingCatalog_1000.csv'
+  loader = CSVLoader(file_path=file)
+
+  from langchain.indexes import VectorstoreIndexCreator
+
+  index = VectorstoreIndexCreator(vectorstore_cls=DocArrayInMemorySearch).from_loaders([loader])
+
+  query ="Please list all your shirts with sun protection in a table in markdown and summarize each one."
+
+  llm_replacement_model = OpenAI(
+    temperature=0, 
+    model='gpt-3.5-turbo-instruct'
+  )
+
+  response = index.query(query, llm = llm_replacement_model)
+
+  display(Markdown(response))
+  ```
+
+However, when faced with large documents, embeddings and vectors are used to combat the issues that arise.
+
+Example Code:
+  ```
+  from langchain.document_loaders import CSVLoader
+  loader = CSVLoader(file_path=file)
+
+  docs = loader.load()
+
+  from langchain.embeddings import OpenAIEmbeddings
+  embeddings = OpenAIEmbeddings()
+
+  embed = embeddings.embed_query("Hi my name is Harrison")
+
+  db = DocArrayInMemorySearch.from_documents(
+    docs, 
+    embeddings
+  )
+
+  query = "Please suggest a shirt with sunblocking"
+  docs = db.similarity_search(query)
+  len(docs)
+
+  retriever = db.as_retriever()
+  llm = ChatOpenAI(temperature = 0.0, model=llm_model)  
+  qdocs = "".join([docs[i].page_content for i in range(len(docs))])
+  response = llm.call_as_llm(f"{qdocs} Question: Please list all your \
+  shirts with sun protection in a table in markdown and summarize each one.") 
+
+  display(Markdown(response))
+  ```
+
+## Evaluation
+
+Create an application.
+
+Example: Q&A Application
+  ```
+  from langchain.chains import RetrievalQA
+  from langchain.chat_models import ChatOpenAI
+  from langchain.document_loaders import CSVLoader
+  from langchain.indexes import VectorstoreIndexCreator
+  from langchain.vectorstores import DocArrayInMemorySearch
+
+  file = 'OutdoorClothingCatalog_1000.csv'
+  loader = CSVLoader(file_path=file)
+  data = loader.load()
+
+  index = VectorstoreIndexCreator(vectorstore_cls=DocArrayInMemorySearch).from_loaders([loader])
+
+  llm = ChatOpenAI(temperature = 0.0, model=llm_model)
+  qa = RetrievalQA.from_chain_type(
+      llm=llm, 
+      chain_type="stuff", 
+      retriever=index.vectorstore.as_retriever(), 
+      verbose=True,
+      chain_type_kwargs = {
+          "document_separator": "<<<<>>>>>"
+      }
+  )
+  ```
+
+Select Test Data.
+
+Creating Examples of Q&A:
+  *Manual*
+  ```
+  examples = [
+    {
+      "query": "Do the Cozy Comfort Pullover Set\
+      have side pockets?",
+      "answer": "Yes"
+    },
+    {
+      "query": "What collection is the Ultra-Lofty \
+      850 Stretch Down Hooded Jacket from?",
+      "answer": "The DownTek collection"
+    }
+  ]
+  ```
+  *LLM-Generated*
+  ```
+  from langchain.evaluation.qa import QAGenerateChain
+
+  example_gen_chain = QAGenerateChain.from_llm(ChatOpenAI(model=llm_model))
+
+  new_examples = example_gen_chain.apply_and_parse(
+    [{"doc": t} for t in data[:5]]
+  )
+  ```
+
+Combined Examples running `examples += new_examples`
+
+Running a query: `qa.run(examples[0]["query"])`
+
+**Manual Evaluation**
+  ```
+  import langchain
+  langchain.debug = True
+
+  qa.run(examples[0]["query"])
+  ```
+
+**LLM-Assissted Evaluation**
+  ```
+  predictions = qa.apply(examples)
+
+  from langchain.evaluation.qa import QAEvalChain
+
+  llm = ChatOpenAI(temperature=0, model=llm_model)
+  eval_chain = QAEvalChain.from_llm(llm)
+
+  graded_outputs = eval_chain.evaluate(examples, predictions)
+
+  for i, eg in enumerate(examples):
+    print(f"Example {i}:")
+    print("Question: " + predictions[i]['query'])
+    print("Real Answer: " + predictions[i]['answer'])
+    print("Predicted Answer: " + predictions[i]['result'])
+    print("Predicted Grade: " + graded_outputs[i]['text'])
+    print()
+  ```
+
+## Agents
+
+*Built-in LangChain Tools:*
+  ```
+  from langchain.agents.agent_toolkits import create_python_agent
+  from langchain.agents import load_tools, initialize_agent
+  from langchain.agents import AgentType
+  from langchain.tools.python.tool import PythonREPLTool
+  from langchain.python import PythonREPL
+  from langchain.chat_models import ChatOpenAI
+
+  llm = ChatOpenAI(temperature=0, model=llm_model)
+
+  agent= initialize_agent(
+    tools, 
+    llm, 
+    agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+    handle_parsing_errors=True,
+    verbose = True
+  )
+
+  agent("What is the 25% of 300?")
+  
+  question = "Tom M. Mitchell is an American computer scientist \
+  and the Founders University Professor at Carnegie Mellon University (CMU)\
+  what book did he write?"
+
+  result = agent(question)
+  ```
+
+  Python Agent:
+  ```
+  agent = create_python_agent(
+    llm,
+    tool=PythonREPLTool(),
+    verbose=True
+  )
+
+  customer_list = [
+    ["Harrison", "Chase"], 
+    ["Lang", "Chain"],
+    ["Dolly", "Too"],
+    ["Elle", "Elem"], 
+    ["Geoff","Fusion"], 
+    ["Trance","Former"],
+    ["Jen","Ayai"]
+  ]
+
+  agent.run(f"""Sort these customers by last name and then first name \
+  and print the output: {customer_list}""")
+  ```
+
+  Detailed Output:
+  ```
+  import langchain
+  langchain.debug=True
+  agent.run(f"""Sort these customers by \
+  last name and then first name \
+  and print the output: {customer_list}""") 
+  langchain.debug=False
+  ```
+
+*Define Original Tool:*
+  ```
+  from langchain.agents import tool
+  from datetime import date
+
+  @tool
+  def time(text: str) -> str:
+    """Returns todays date, use this for any \
+    questions related to knowing todays date. \
+    The input should always be an empty string, \
+    and this function will always return todays \
+    date - any date mathmatics should occur \
+    outside this function."""
+    return str(date.today())
+
+  agent= initialize_agent(
+    tools + [time], 
+    llm, 
+    agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+    handle_parsing_errors=True,
+    verbose = True
+  )
+
+  try:
+    result = agent("whats the date today?") 
+  except: 
+    print("exception on external access")
+  ```
