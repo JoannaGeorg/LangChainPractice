@@ -20,8 +20,8 @@ To Do:
 ## Task 3: Question and Answers with LangChain
 
 To Do:
-- [ ] Load sample documents/data
-- [ ] Provide relevant context to the model
-- [ ] Ask questions against the supplied information
-- [ ] Test different questions
-- [ ] Improve response quality
+- [x] Load sample documents/data
+- [x] Provide relevant context to the model
+- [x] Ask questions against the supplied information
+- [x] Test different questions
+- [x] Improve response quality
