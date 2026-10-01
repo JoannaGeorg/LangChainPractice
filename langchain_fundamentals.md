@@ -630,3 +630,94 @@ Example Code:
 
   display(Markdown(response))
   ```
+
+## Evaluation
+
+Create an application.
+
+Example: Q&A Application
+  ```
+  from langchain.chains import RetrievalQA
+  from langchain.chat_models import ChatOpenAI
+  from langchain.document_loaders import CSVLoader
+  from langchain.indexes import VectorstoreIndexCreator
+  from langchain.vectorstores import DocArrayInMemorySearch
+
+  file = 'OutdoorClothingCatalog_1000.csv'
+  loader = CSVLoader(file_path=file)
+  data = loader.load()
+
+  index = VectorstoreIndexCreator(vectorstore_cls=DocArrayInMemorySearch).from_loaders([loader])
+
+  llm = ChatOpenAI(temperature = 0.0, model=llm_model)
+  qa = RetrievalQA.from_chain_type(
+      llm=llm, 
+      chain_type="stuff", 
+      retriever=index.vectorstore.as_retriever(), 
+      verbose=True,
+      chain_type_kwargs = {
+          "document_separator": "<<<<>>>>>"
+      }
+  )
+  ```
+
+Select Test Data.
+
+Creating Examples of Q&A:
+  *Manual*
+  ```
+  examples = [
+    {
+      "query": "Do the Cozy Comfort Pullover Set\
+      have side pockets?",
+      "answer": "Yes"
+    },
+    {
+      "query": "What collection is the Ultra-Lofty \
+      850 Stretch Down Hooded Jacket from?",
+      "answer": "The DownTek collection"
+    }
+  ]
+  ```
+  *LLM-Generated*
+  ```
+  from langchain.evaluation.qa import QAGenerateChain
+
+  example_gen_chain = QAGenerateChain.from_llm(ChatOpenAI(model=llm_model))
+
+  new_examples = example_gen_chain.apply_and_parse(
+    [{"doc": t} for t in data[:5]]
+  )
+  ```
+
+Combined Examples running `examples += new_examples`
+
+Running a query: `qa.run(examples[0]["query"])`
+
+**Manual Evaluation**
+  ```
+  import langchain
+  langchain.debug = True
+
+  qa.run(examples[0]["query"])
+  ```
+
+**LLM-Assissted Evaluation**
+  ```
+  predictions = qa.apply(examples)
+
+  from langchain.evaluation.qa import QAEvalChain
+
+  llm = ChatOpenAI(temperature=0, model=llm_model)
+  eval_chain = QAEvalChain.from_llm(llm)
+
+  graded_outputs = eval_chain.evaluate(examples, predictions)
+
+  for i, eg in enumerate(examples):
+    print(f"Example {i}:")
+    print("Question: " + predictions[i]['query'])
+    print("Real Answer: " + predictions[i]['answer'])
+    print("Predicted Answer: " + predictions[i]['result'])
+    print("Predicted Grade: " + graded_outputs[i]['text'])
+    print()
+  ```
