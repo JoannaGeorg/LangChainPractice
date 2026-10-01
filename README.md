@@ -29,7 +29,7 @@ To Do:
 ## Task 4: Evaluation and Agents in LangChain
 
 To Do:
-- [ ] Evaluate LangChain outputs
-- [ ] Experiment with tools
-- [ ] Build a basic agent
-- [ ] Understand how an agent selects an action/tool
+- [x] Evaluate LangChain outputs
+- [x] Experiment with tools
+- [x] Build a basic agent
+- [x] Understand how an agent selects an action/tool
