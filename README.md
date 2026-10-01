@@ -25,3 +25,11 @@ To Do:
 - [x] Ask questions against the supplied information
 - [x] Test different questions
 - [x] Improve response quality
+
+## Task 4: Evaluation and Agents in LangChain
+
+To Do:
+- [ ] Evaluate LangChain outputs
+- [ ] Experiment with tools
+- [ ] Build a basic agent
+- [ ] Understand how an agent selects an action/tool
