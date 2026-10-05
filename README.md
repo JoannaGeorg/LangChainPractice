@@ -33,3 +33,11 @@ To Do:
 - [x] Experiment with tools
 - [x] Build a basic agent
 - [x] Understand how an agent selects an action/tool
+
+## Task 5: Building an Agent from Scratch
+
+To Do:
+- [x] Build a basic agent
+- [x] Understand the agent execution loop
+- [x] Add a simple tool
+- [x] Test agent decisions
