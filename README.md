@@ -37,7 +37,7 @@ To Do:
 ## Task 5: Building an Agent from Scratch
 
 To Do:
-- [ ] Build a basic agent
-- [ ] Understand the agent execution loop
-- [ ] Add a simple tool
-- [ ] Test agent decisions
+- [x] Build a basic agent
+- [x] Understand the agent execution loop
+- [x] Add a simple tool
+- [x] Test agent decisions
