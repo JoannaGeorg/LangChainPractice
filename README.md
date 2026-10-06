@@ -41,3 +41,12 @@ To Do:
 - [x] Understand the agent execution loop
 - [x] Add a simple tool
 - [x] Test agent decisions
+
+## Task 6: LangGraph Components and State
+
+To Do:
+- [ ] Define application state
+- [ ] Create nodes
+- [ ] Connect nodes
+- [ ] Build a simple graph
+- [ ] Test state transitions
