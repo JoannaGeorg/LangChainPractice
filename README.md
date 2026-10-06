@@ -45,8 +45,8 @@ To Do:
 ## Task 6: LangGraph Components and State
 
 To Do:
-- [ ] Define application state
-- [ ] Create nodes
-- [ ] Connect nodes
-- [ ] Build a simple graph
-- [ ] Test state transitions
+- [x] Define application state
+- [x] Create nodes
+- [x] Connect nodes
+- [x] Build a simple graph
+- [x] Test state transitions
