@@ -54,7 +54,7 @@ To Do:
 ## Task 7: Tools, Search, Persistance, and Streaming
 
 To Do:
-- [ ] Add a search/tool capability
+- [x] Add a search/tool capability
 - [ ] Implement persistent state
 - [ ] Test streaming responses
 - [ ] Build a multi-step agent workflow
