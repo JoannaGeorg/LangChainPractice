@@ -55,7 +55,7 @@ To Do:
 
 To Do:
 - [x] Add a search/tool capability
-- [ ] Implement persistent state
-- [ ] Test streaming responses
-- [ ] Build a multi-step agent workflow
-- [ ] Connect tools to the agent
+- [x] Implement persistent state
+- [x] Test streaming responses
+- [x] Build a multi-step agent workflow
+- [x] Connect tools to the agent
