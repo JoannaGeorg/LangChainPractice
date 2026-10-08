@@ -59,3 +59,11 @@ To Do:
 - [x] Test streaming responses
 - [x] Build a multi-step agent workflow
 - [x] Connect tools to the agent
+
+## Task 8: Human-in-the-loop and Agent Application
+
+To Do:
+- [ ] Human in the loop
+- [ ] Essay Writer workflow
+- [ ] LangChain resources
+- [ ] Course conclusion
