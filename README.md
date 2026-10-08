@@ -50,3 +50,12 @@ To Do:
 - [x] Connect nodes
 - [x] Build a simple graph
 - [x] Test state transitions
+
+## Task 7: Tools, Search, Persistance, and Streaming
+
+To Do:
+- [x] Add a search/tool capability
+- [x] Implement persistent state
+- [x] Test streaming responses
+- [x] Build a multi-step agent workflow
+- [x] Connect tools to the agent
