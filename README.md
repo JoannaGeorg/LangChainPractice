@@ -63,7 +63,7 @@ To Do:
 ## Task 8: Human-in-the-loop and Agent Application
 
 To Do:
-- [ ] Human in the loop
-- [ ] Essay Writer workflow
-- [ ] LangChain resources
-- [ ] Course conclusion
+- [x] Human in the loop
+- [x] Essay Writer workflow
+- [x] LangChain resources
+- [x] Course conclusion
